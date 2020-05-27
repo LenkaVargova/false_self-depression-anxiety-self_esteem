@@ -114,6 +114,10 @@ VIF <- function(linear.model, no.intercept=FALSE, all.diagnostics=FALSE,
 
 VIF(lm(depression ~ anxiety + self_esteem, data = false_self_data), 
     all.diagnostics = TRUE) 
+VIF(lm(anxiety ~ self_esteem + depression, data = false_self_data), 
+    all.diagnostics = TRUE)
+VIF(lm(self_esteem ~ depression + anxiety, data = false_self_data), 
+    all.diagnostics = TRUE)
 
 ###################################################
 ### hierarchical linear regression - depression ###
