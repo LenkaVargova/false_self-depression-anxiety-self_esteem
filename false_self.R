@@ -32,9 +32,9 @@ data_describe_cor <- data_describe[,2:5]
 
 apa.cor.table(data_describe_cor, filename="Table1.doc", table.number=1)
 
-#assumptions for regressions
+#assumptions for regression
 
-##target regression: depression ~ self_esteem + false_self + gender + age
+##target regression: depression ~ self_esteem*false_self + gender + age
 
 ##linearity
 
@@ -44,24 +44,7 @@ summary(lm(depression ~ self_esteem, data = false_self_data))$r.squared
 summary(lm(depression ~ false_self, data = false_self_data))
 summary(lm(depression ~ false_self, data = false_self_data))$r.squared
 
-##multicolinearity
-#VIF function: https://rpubs.com/seriousstats/vif
-
-VIF <- function(linear.model, no.intercept=FALSE, all.diagnostics=FALSE, 
-                plot=FALSE) {
-  require(mctest)
-  if(no.intercept==FALSE) design.matrix <- model.matrix(linear.model)[,-1]
-  if(no.intercept==TRUE) design.matrix <- model.matrix(linear.model)
-  if(plot==TRUE) mc.plot(design.matrix,linear.model$model[1])
-  if(all.diagnostics==FALSE) output <- imcdiag(design.matrix,linear.model$model[1], method='VIF')$idiags[,1]
-  if(all.diagnostics==TRUE) output <- imcdiag(design.matrix,linear.model$model[1])
-  output
-}
-
-VIF(lm(self_esteem ~ false_self, data = false_self_data), 
-    all.diagnostics = TRUE)
-
-##target regression: anxiety ~ self_esteem + false_self + gender + age
+##target regression: anxiety ~ self_esteem*false_self + gender + age
 
 ##linearity
 
@@ -71,24 +54,11 @@ summary(lm(anxiety ~ self_esteem, data = false_self_data))$r.squared
 summary(lm(anxiety ~ false_self, data = false_self_data))
 summary(lm(anxiety ~ false_self, data = false_self_data))$r.squared
 
-##multicolinearity
-#VIF function: https://rpubs.com/seriousstats/vif
+##colinearity
 
-VIF <- function(linear.model, no.intercept=FALSE, all.diagnostics=FALSE, 
-                plot=FALSE) {
-  require(mctest)
-  if(no.intercept==FALSE) design.matrix <- model.matrix(linear.model)[,-1]
-  if(no.intercept==TRUE) design.matrix <- model.matrix(linear.model)
-  if(plot==TRUE) mc.plot(design.matrix,linear.model$model[1])
-  if(all.diagnostics==FALSE) output <- imcdiag(design.matrix,linear.model$model[1], method='VIF')$idiags[,1]
-  if(all.diagnostics==TRUE) output <- imcdiag(design.matrix,linear.model$model[1])
-  output
-}
+cor(false_self_data$self_esteem, false_self_data$false_self)
 
-VIF(lm(self_esteem ~ false_self, data = false_self_data), 
-    all.diagnostics = TRUE)
-
-##target regression: false_self ~ depression + anxiety + self_esteem + gender + age
+##target regression: false_self ~ depression*self_esteem + anxiety*self_esteem + gender + age,
 
 ###false self
 summary(lm(false_self ~ self_esteem, data = false_self_data))
@@ -112,22 +82,22 @@ VIF <- function(linear.model, no.intercept=FALSE, all.diagnostics=FALSE,
   output
 }
 
-VIF(lm(depression ~ anxiety + self_esteem, data = false_self_data), 
-    all.diagnostics = TRUE) 
-VIF(lm(anxiety ~ self_esteem + depression, data = false_self_data), 
-    all.diagnostics = TRUE)
 VIF(lm(self_esteem ~ depression + anxiety, data = false_self_data), 
+    all.diagnostics = TRUE) 
+VIF(lm(depression ~ self_esteem + anxiety, data = false_self_data), 
+    all.diagnostics = TRUE)
+VIF(lm(anxiety ~ depression + self_esteem, data = false_self_data), 
     all.diagnostics = TRUE)
 
 ###################################################
 ### hierarchical linear regression - depression ###
 ###################################################
 
-block1d <- lm(depression ~ false_self, data = false_self_data)
+block1d <- lm(depression ~ false_self + age + gender, data = false_self_data)
 summary(block1d)
 summary(block1d_beta <- lm.beta(block1d))
 
-block2d <- update(block1d, . ~ . + age + gender + self_esteem)
+block2d <- update(block1d, . ~ . + self_esteem)
 summary(block2d)
 summary(block2d_beta <- lm.beta(block2d))
 
@@ -143,11 +113,11 @@ anova(block1d,block2d,block3d)
 ### hierarchical linear regression - anxiety ###
 ###################################################
 
-block1a <- lm(anxiety ~ false_self, data = false_self_data)
+block1a <- lm(anxiety ~ false_self + age + gender, data = false_self_data)
 summary(block1a)
 summary(block1a_beta <- lm.beta(block1a))
 
-block2a <- update(block1a, . ~ . + age + gender + self_esteem)
+block2a <- update(block1a, . ~ . + self_esteem)
 summary(block2a)
 summary(block2a_beta <- lm.beta(block2a))
 
@@ -163,11 +133,11 @@ anova(block1a,block2a,block3a)
 ### hierarchical linear regression - false_self ###
 ###################################################
 
-block1f <- lm(false_self ~ self_esteem, data = false_self_data)
+block1f <- lm(false_self ~ self_esteem + age + gender, data = false_self_data)
 summary(block1f)
 summary(block1f_beta <- lm.beta(block1f))
 
-block2f <- update(block1f, . ~ . + age + gender + depression + anxiety)
+block2f <- update(block1f, . ~ . + depression + anxiety)
 summary(block2f)
 summary(block2f_beta <- lm.beta(block2f))
 
