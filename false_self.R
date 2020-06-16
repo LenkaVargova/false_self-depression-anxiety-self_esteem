@@ -156,3 +156,13 @@ plotCurves(block3f, plotx="self_esteem", modx="anxiety",
            col = c("blue", "black", "orange"),
            interval="confidence", 
            main = "Moderation effect of anxiety on relation of false self and self-esteem")
+
+#alternative hypothesis - vicious circle? depression_self-esteem_false-self
+block1 <- lm(self_esteem ~ false_self, data = false_self_data)
+summary(block1)
+summary(block1_beta <- lm.beta(block1))
+
+block2 <- update(block1, . ~ . + gender + depression + anxiety)
+summary(block2)
+summary(block2_beta <- lm.beta(block2))
+
