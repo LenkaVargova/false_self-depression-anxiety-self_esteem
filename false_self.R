@@ -93,11 +93,11 @@ VIF(lm(anxiety ~ depression + self_esteem, data = false_self_data),
 ### hierarchical linear regression - depression ###
 ###################################################
 
-block1d <- lm(depression ~ false_self + age + gender, data = false_self_data)
+block1d <- lm(depression ~ false_self, data = false_self_data)
 summary(block1d)
 summary(block1d_beta <- lm.beta(block1d))
 
-block2d <- update(block1d, . ~ . + self_esteem)
+block2d <- update(block1d, . ~ . + gender + self_esteem)
 summary(block2d)
 summary(block2d_beta <- lm.beta(block2d))
 
@@ -113,11 +113,11 @@ anova(block1d,block2d,block3d)
 ### hierarchical linear regression - anxiety ###
 ###################################################
 
-block1a <- lm(anxiety ~ false_self + age + gender, data = false_self_data)
+block1a <- lm(anxiety ~ false_self, data = false_self_data)
 summary(block1a)
 summary(block1a_beta <- lm.beta(block1a))
 
-block2a <- update(block1a, . ~ . + self_esteem)
+block2a <- update(block1a, . ~ . + gender + self_esteem)
 summary(block2a)
 summary(block2a_beta <- lm.beta(block2a))
 
@@ -133,11 +133,11 @@ anova(block1a,block2a,block3a)
 ### hierarchical linear regression - false_self ###
 ###################################################
 
-block1f <- lm(false_self ~ self_esteem + age + gender, data = false_self_data)
+block1f <- lm(false_self ~ self_esteem, data = false_self_data)
 summary(block1f)
 summary(block1f_beta <- lm.beta(block1f))
 
-block2f <- update(block1f, . ~ . + depression + anxiety)
+block2f <- update(block1f, . ~ . + gender + depression + anxiety)
 summary(block2f)
 summary(block2f_beta <- lm.beta(block2f))
 
