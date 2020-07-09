@@ -126,9 +126,7 @@ summary(block2a)
 summary(block2a_beta <- lm.beta(block2a))
 
 block3a <- update(block2a, . ~ . + false_self:self_esteem)
-
 summary(block3a)
-
 summary(block3a_beta <- lm.beta(block3a))
 
 anova(block1a,block2a,block3a)
@@ -146,9 +144,7 @@ summary(block2f)
 summary(block2f_beta <- lm.beta(block2f))
 
 block3f <- update(block2f, . ~ . + depression:self_esteem + anxiety:self_esteem)
-
 summary(block3f)
-
 summary(block3f_beta <- lm.beta(block3f))
 
 anova(block1f,block2f,block3f)
@@ -159,16 +155,6 @@ plotCurves(block3f, plotx="self_esteem", modx="anxiety",
            modxVals="std.dev.",
            col = c("blue", "black", "orange"),
            interval="confidence", 
-           main = "Moderation effect of anxiety on relation of false self and self-esteem")
+           main = "Moderation effect of anxiety on the relationship of false self and self-esteem")
 
-#alternative hypothesis - vicious circle? depression_self-esteem_false-self
-block1 <- lm(self_esteem ~ false_self, data = false_self_data)
-summary(block1)
-block1_beta <- lm.beta(block1)
-summary(block1_beta <- lm.beta(block1))
-confint(block1_beta, 'false_self', level = 0.95)
-
-block2 <- update(block1, . ~ . + gender + depression + anxiety)
-summary(block2)
-summary(block2_beta <- lm.beta(block2))
 
