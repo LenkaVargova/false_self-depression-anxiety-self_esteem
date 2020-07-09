@@ -9,14 +9,14 @@ View(false_self_data)
 #load packages
 
 library(psych)
-library(mctest)
+library(car)
 library(rockchalk)
 library(apaTables)
 library(lm.beta)
 
 #descriptives
 
-data_describe<- subset (false_self_data, select = c(age, false_self, depression, 
+data_describe <- subset (false_self_data, select = c(age, false_self, depression, 
                                          anxiety, self_esteem))
 describe (data_describe)
 
@@ -54,11 +54,13 @@ summary(lm(anxiety ~ self_esteem, data = false_self_data))$r.squared
 summary(lm(anxiety ~ false_self, data = false_self_data))
 summary(lm(anxiety ~ false_self, data = false_self_data))$r.squared
 
-##colinearity
+##colinearity for Block 1 for all hierarchical models
 
 cor(false_self_data$self_esteem, false_self_data$false_self)
+cor(false_self_data$depression, false_self_data$false_self)
+cor(false_self_data$anxiety, false_self_data$false_self)
 
-##target regression: false_self ~ depression*self_esteem + anxiety*self_esteem + gender + age,
+##target regressions: false_self ~ depression*self_esteem + anxiety*self_esteem + gender; depression ~ false_self*anxiety + false_self*self_esteem + gender; anxiety ~ flase_self*sel_esteem + false_self*depression
 
 ###false self
 summary(lm(false_self ~ self_esteem, data = false_self_data))
@@ -68,26 +70,28 @@ summary(lm(false_self ~ depression, data = false_self_data))$r.squared
 summary(lm(false_self ~ anxiety, data = false_self_data))
 summary(lm(false_self ~ anxiety, data = false_self_data))$r.squared
 
+###depression
+summary(lm(depression ~ self_esteem, data = false_self_data))
+summary(lm(depression ~ self_esteem, data = false_self_data))$r.squared
+summary(lm(depression ~ false_self, data = false_self_data))
+summary(lm(depression ~ false_self, data = false_self_data))$r.squared
+summary(lm(depression ~ anxiety, data = false_self_data))
+summary(lm(depression ~ anxiety, data = false_self_data))$r.squared
+
+###depression
+summary(lm(anxiety ~ self_esteem, data = false_self_data))
+summary(lm(anxiety ~ self_esteem, data = false_self_data))$r.squared
+summary(lm(anxiety ~ false_self, data = false_self_data))
+summary(lm(anxiety ~ false_self, data = false_self_data))$r.squared
+summary(lm(anxiety ~ depression, data = false_self_data))
+summary(lm(anxiety ~ depression, data = false_self_data))$r.squared
+
 ##multicolinearity
-#VIF function: https://rpubs.com/seriousstats/vif
 
-VIF <- function(linear.model, no.intercept=FALSE, all.diagnostics=FALSE, 
-                plot=FALSE) {
-  require(mctest)
-  if(no.intercept==FALSE) design.matrix <- model.matrix(linear.model)[,-1]
-  if(no.intercept==TRUE) design.matrix <- model.matrix(linear.model)
-  if(plot==TRUE) mc.plot(design.matrix,linear.model$model[1])
-  if(all.diagnostics==FALSE) output <- imcdiag(design.matrix,linear.model$model[1], method='VIF')$idiags[,1]
-  if(all.diagnostics==TRUE) output <- imcdiag(design.matrix,linear.model$model[1])
-  output
-}
-
-VIF(lm(self_esteem ~ depression + anxiety, data = false_self_data), 
-    all.diagnostics = TRUE) 
-VIF(lm(depression ~ self_esteem + anxiety, data = false_self_data), 
-    all.diagnostics = TRUE)
-VIF(lm(anxiety ~ depression + self_esteem, data = false_self_data), 
-    all.diagnostics = TRUE)
+car::vif(lm(false_self ~ self_esteem + depression + anxiety, data = false_self_data))
+car::vif(lm(depression ~ false_self + self_esteem + anxiety, data = false_self_data))
+car::vif(lm(anxiety ~ false_self + depression + self_esteem, data = false_self_data))
+car::vif(lm(self_esteem ~ false_self + depression + anxiety, data = false_self_data))
 
 ###################################################
 ### hierarchical linear regression - depression ###
@@ -160,7 +164,9 @@ plotCurves(block3f, plotx="self_esteem", modx="anxiety",
 #alternative hypothesis - vicious circle? depression_self-esteem_false-self
 block1 <- lm(self_esteem ~ false_self, data = false_self_data)
 summary(block1)
+block1_beta <- lm.beta(block1)
 summary(block1_beta <- lm.beta(block1))
+confint(block1_beta, 'false_self', level = 0.95)
 
 block2 <- update(block1, . ~ . + gender + depression + anxiety)
 summary(block2)
