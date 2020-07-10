@@ -9,6 +9,7 @@ View(false_self_data)
 #load packages
 
 library(psych)
+library(GPArotation)
 library(car)
 library(rockchalk)
 library(apaTables)
@@ -31,6 +32,14 @@ false_self_data$gender <- as.numeric(as.character(false_self_data$gender))
 data_describe_cor <- data_describe[,2:5]
 
 apa.cor.table(data_describe_cor, filename="Table1.doc", table.number=1)
+
+describe(false_self_data[,71:74])
+
+##reliability
+omega(false_self_data[,3:18]) #false self
+omega(false_self_data[,19:39]) #depression
+omega(false_self_data[,40:60]) #anxiety
+omega(false_self_data[,61:70]) #self-esteem
 
 #assumptions for regression
 
